@@ -1,0 +1,17 @@
+certifi==2023.7.22
+contourpy==1.1.0
+cycler==0.11.0
+fonttools==4.42.1
+importlib-resources==6.0.1
+jplephem==2.19
+kiwisolver==1.4.5
+matplotlib==3.7.3
+numpy==1.25.2
+packaging==23.1
+Pillow==10.0.0
+pyparsing==3.1.1
+python-dateutil==2.8.2
+sgp4==2.22
+six==1.16.0
+skyfield==1.46
+zipp==3.16.2
