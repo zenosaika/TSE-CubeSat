@@ -3,6 +3,7 @@ from datetime import timedelta
 import math
 import numpy as np
 import matplotlib as mpl
+import cartopy.crs as ccrs
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
@@ -23,6 +24,36 @@ EARTH_RADIUS = 6378 # in km
 def load_satellites(filepath):
     satellites = load.tle_file(filepath)
     return {sat.name: sat for sat in satellites}
+
+
+def animate_util(point_of_time_i, timeseries_footprints, polygons):
+    for polygon, timeseries_footprint in zip(polygons, timeseries_footprints):
+        footprint = np.array(timeseries_footprint[point_of_time_i]['footprint'])
+        polygon.set_data(footprint[:, 1], footprint[:, 0])
+
+
+def animate_globalmap(timeseries_footprints):
+    fig = plt.figure(figsize=(10, 5))
+    ax = fig.add_subplot(1, 1, 1, projection=ccrs.Robinson())
+
+    ax.stock_img()
+    ax.coastlines()
+
+    polygons = [
+        ax.plot([], [], color='blue', transform=ccrs.PlateCarree())[0] 
+        for _ in timeseries_footprints
+    ]
+
+    ani = animation.FuncAnimation(
+        fig, animate_util, len(timeseries_footprints[0]), 
+        fargs=(
+            timeseries_footprints,
+            polygons,
+        ),
+        interval=100
+    )
+
+    plt.show()
 
 
 def euclidean_distance(position1, position2):
@@ -87,12 +118,7 @@ def main():
             for i in range(int(duration.total_seconds()/60) + 1)
         ])
 
-    # x = timeseries_footprints[0][13]['footprint']
-    # for e in x:
-    #     lat = e[0]
-    #     lon = e[1]
-    #     print(f'{lon},{lat}')
-    # http://dwtkns.com/pointplotter/
+    animate_globalmap(timeseries_footprints)
     
     
 main()
