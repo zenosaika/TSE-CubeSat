@@ -289,7 +289,7 @@ def main():
     t0 = ts.now() # get current time
     t1 = t0 + timedelta(days=1)
 
-    satellites = load_satellites('theos.txt')
+    satellites = load_satellites('test.txt')
     print(f'Loaded {len(satellites)} satellites')
 
     timeseries_informations = []

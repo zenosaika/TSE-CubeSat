@@ -1,3 +1,4 @@
+Cartopy==0.22.0
 certifi==2023.7.22
 contourpy==1.1.0
 cycler==0.11.0
@@ -8,10 +9,18 @@ kiwisolver==1.4.5
 matplotlib==3.7.3
 numpy==1.25.2
 packaging==23.1
+pandas==2.1.0
 Pillow==10.0.0
 pyparsing==3.1.1
+pyproj==3.6.0
+pyshp==2.3.1
 python-dateutil==2.8.2
+pytz==2023.3.post1
+scipy==1.11.2
+seaborn==0.12.2
 sgp4==2.22
+shapely==2.0.1
 six==1.16.0
 skyfield==1.46
+tzdata==2023.3
 zipp==3.16.2
