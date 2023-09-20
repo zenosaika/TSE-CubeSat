@@ -107,9 +107,12 @@ def get_percent_coverages(timeseries_footprints, preferred_region):
             footprint = timeseries_footprints[satellite_i][point_of_time_i]['footprint']
             polygon = Polygon([(lon, lat) for lat, lon in footprint])
             multi_polygon.append(polygon)
-        
-        multi_polygon = MultiPolygon(multi_polygon) # union all footprint at time = t
-        difference = preferred_polygon - multi_polygon # find difference (set operation)
+    
+        union_polygon = Polygon()
+        for polygon in multi_polygon:
+            union_polygon = union_polygon | polygon
+        difference = preferred_polygon - union_polygon
+
         percent_coverage = (preferred_polygon.area-difference.area) / preferred_polygon.area * 100
         percent_coverages.append(percent_coverage)
 
