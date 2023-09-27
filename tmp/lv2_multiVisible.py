@@ -1,15 +1,8 @@
 from skyfield.api import load, wgs84
 from datetime import timedelta
 import numpy as np
-import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-
-mpl.font_manager.fontManager.addfont('THSarabunChula-Regular.ttf')
-font = {'family' : 'TH Sarabun Chula',
-        'weight' : 'bold',
-        'size'   : 16}
-mpl.rc('font', **font)
 
 MINIMUM_ELEVATION_ANGLE = 10.0 # should be dynamic (will update in lv.4)
 
@@ -52,7 +45,6 @@ def get_information_at(t, satellite, observer_latlon):
     alt, az, distance = topocentric.altaz()
 
     return {
-        'name': satellite.name,
         'datetime': t,
         'geocentric': geocentric.position.km,
         'topocentric': topocentric.position.km,
@@ -208,7 +200,7 @@ def polar_subplot(ax4, timeseries_informations):
 
 
 def animation_plot(timeseries_informations, events_of_each_satellite, t0, satellites):
-    fig = plt.figure(1, figsize=(13, 8))
+    fig = plt.figure(figsize=(13, 8))
     plt.subplots_adjust(left=0.1, right=0.9, bottom=0.1, top=0.9, wspace=0.2, hspace=0.4)
     ax1 = fig.add_subplot(2, 2, 1, projection='3d')
     ax1.title.set_text('Topocentric (Relatives to Observer)')
@@ -237,59 +229,12 @@ def animation_plot(timeseries_informations, events_of_each_satellite, t0, satell
     plt.show()
 
 
-def visible_event(timeseries_informations, t0):
-    freq_array = [0 for _ in range(len(timeseries_informations[0]))]
-
-    for timeseries_information in timeseries_informations:
-        for i, info in enumerate(timeseries_information):
-            if info['visible']:
-                freq_array[i] += 1
-
-    x = 0.5 + np.arange(len(freq_array))
-    y = freq_array
-
-    fig = plt.figure(2, figsize=(12, 5))
-    ax1 = fig.add_subplot(1, 2, 1)
-    ax1.bar(x, y, width=1, edgecolor="black", linewidth=0.7)
-    ax1.title.set_text('พบว่าใน 1 วัน จะมีช่วงที่รับส่งสัญญาณจากดาวเทียมได้ 2 ช่วงใหญ่')
-    ax1.set_xlabel(f"[Minutes from {t0.utc_strftime('%Y %b %d %H:%M:%S (UTC)')}]")
-    ax1.set_ylabel('Number of Visible Satellites')
-
-    ax2 = fig.add_subplot(1, 2, 2)
-    ax2.bar(x, y, width=1, edgecolor="black", linewidth=0.7)
-    ax2.title.set_text('แต่ยังมี gap ระหว่างรอดาวเทียมดวงใหม่เข้ามาในพิสัยอยู่')
-    ax2.set_xlabel(f"[Minutes from {t0.utc_strftime('%Y %b %d %H:%M:%S (UTC)')}]")
-    ax2.set_ylabel('Number of Visible Satellites')
-
-
-def extract_events(events_of_each_satellite, timeseries_informations, t0):
-    event_names = {
-        'rise': 'ดาวเทียมเข้ามาในพิสัย', 
-        'culminate': 'อยู่ในจุด upper culmination', 
-        'set': 'ดาวเทียมออกจากพิสัย'
-    }
-
-    unsorted_events = []
-
-    for events, timeseries_information in zip(events_of_each_satellite, timeseries_informations):
-        for event in events:
-            satellite_name = timeseries_information[0]['name']
-            event_name = event_names[event[0]]
-            time = event[1]
-            minutes_since_t0 = int(timedelta(days=time - t0).total_seconds() / 60)
-            azimuth = timeseries_information[minutes_since_t0]['azimuth']
-            elevation = timeseries_information[minutes_since_t0]['altitude']
-            unsorted_events.append((minutes_since_t0, satellite_name, event_name, time, azimuth, elevation))
-
-    return sorted(unsorted_events)
-
-
 def main():
-    observer_latlon = wgs84.latlon(+14.0691107, +100.6051873) # at TSE Building
+    observer_latlon = wgs84.latlon(+18.3170581, +99.3986862) # at Thammasat
     t0 = ts.now() # get current time
     t1 = t0 + timedelta(days=1)
 
-    satellites = load_satellites('test.txt')
+    satellites = load_satellites('TLE/starlink.txt')
     print(f'Loaded {len(satellites)} satellites')
 
     timeseries_informations = []
@@ -305,11 +250,6 @@ def main():
         events_of_each_satellite.append(events)
 
     print()
-    sorted_events = extract_events(events_of_each_satellite, timeseries_informations, t0)
-    for minutes_since_t0, satellite_name, event_name, time, azimuth, elevation in sorted_events:
-        print(f"[{satellite_name}] {time.utc_strftime('%Y %b %d %H:%M:%S (UTC)')} {event_name} ที่ Azimuth: {azimuth}, Elevation: {elevation}")
-
-    visible_event(timeseries_informations, t0)
     animation_plot(timeseries_informations, events_of_each_satellite, t0, satellites)
 
     

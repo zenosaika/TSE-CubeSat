@@ -109,8 +109,8 @@ def main():
     t0 = ts.now() # get current time
     t1 = t0 + timedelta(days=1)
 
-    satellites = load_satellites('satellites_tle.txt')
-    satellite = satellites['ISS'] # set preferred satellite
+    satellites = load_satellites('TLE/THEOS1.txt')
+    satellite = satellites['THEOS'] # set preferred satellite
 
     find_events(satellite, observer_latlon, t0, t1)
 
